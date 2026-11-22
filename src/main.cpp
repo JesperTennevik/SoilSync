@@ -1,18 +1,40 @@
 #include <Arduino.h>
+#include "DeviceSettings.h"
+#include "SettingsStorage.h"
 
-// put function declarations here:
-int myFunction(int, int);
+DeviceSettings settings;
+
+void printSettings(){
+    Serial.print("DeviceId: ");
+    Serial.println(settings.deviceId);
+
+    Serial.print("DeviceLocation: ");
+    Serial.println(settings.deviceLocation);
+    
+    Serial.print("MeasurementInterval: ");
+    Serial.println(settings.measurementInterval);
+
+    Serial.print("WifiSSID: ");
+    Serial.println(settings.wifiSSID);
+
+    Serial.print("WifiPassword: ");
+    Serial.println(settings.wifiPassword);
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+    Serial.begin(115200);
+    delay(2000);
+
+    SettingsStorage::load(settings);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
+    static unsigned long lastSettingsPrint = 0;
+    if(millis() - lastSettingsPrint >= 5000){
+        printSettings();
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+        Serial.print(F("------------------"));
+
+        lastSettingsPrint = millis();
+    }
 }

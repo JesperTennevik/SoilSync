@@ -5,7 +5,7 @@
 typedef struct {
     char deviceId[37];
     char deviceLocation[33];
-    uint16_t measurementInterval;
+    unsigned long measurementInterval;
     
     char wifiSSID[33];
     char wifiPassword[65];

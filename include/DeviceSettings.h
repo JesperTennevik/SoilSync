@@ -1,10 +1,9 @@
 #pragma once
-
-#include <WiFi.h>
+#include <cstddef>
+#include <cstring>
 
 typedef struct {
     char deviceId[37];
-    char deviceLocation[33];
     unsigned long measurementInterval;
     
     char wifiSSID[33];
@@ -18,7 +17,6 @@ bool hasTerminator(const char (&value)[N]) {
 
 inline bool validSettings(const DeviceSettings& settings){
     if (!hasTerminator(settings.deviceId) ||
-        !hasTerminator(settings.deviceLocation) ||
         !hasTerminator(settings.wifiSSID) ||
         !hasTerminator(settings.wifiPassword)
     ){
@@ -26,7 +24,6 @@ inline bool validSettings(const DeviceSettings& settings){
     }
 
     if (settings.deviceId[0] == '\0' ||
-        settings.deviceLocation[0] == '\0' ||
         settings.wifiSSID[0] == '\0' ||
         settings.wifiPassword[0] == '\0'
     ){

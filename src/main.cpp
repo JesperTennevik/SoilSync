@@ -4,6 +4,10 @@
 #include "SettingsStorage.h"
 #include "AWSConnection.h"
 
+#define SENSOR_PIN A0
+#define DRY_VALUE 3090
+#define WET_VALUE 1100
+
 DeviceSettings settings;
 void printSettings(){
     Serial.println();
@@ -20,15 +24,28 @@ void printSettings(){
     Serial.println(settings.wifiPassword);
 }
 
-bool sendTelemetry() {
-  Serial.println("Sending telemetry to AWS");
-  bool sendResult =
-      AWSConnection::publishTelemetry(
-        "{\"temperature\":" + String(random(15.0, 30.0)) +
-        ",\"humidity\":" + String(random(50, 90)) + "}"
-      );
+int readMoisture(){
+    long sum = 0;
 
-  return sendResult;
+    for(int i = 0; i < 20; i++){
+        sum += analogRead(SENSOR_PIN);
+    }
+
+    int avg = sum / 20;
+
+    int moisturePercent = map(
+        avg,
+        DRY_VALUE,
+        WET_VALUE,
+        0,
+        100
+    );
+
+    return constrain(
+        moisturePercent,
+        0,
+        100
+    );
 }
 
 void setup() {
@@ -38,34 +55,46 @@ void setup() {
     SettingsStorage::load(settings);
     printSettings();
     AWSConnection::connectAWS(settings);
+    
+    analogReadResolution(12);
+    analogSetAttenuation(ADC_11db);
 }
 
 void loop() {
     AWSConnection::loop();
 
-    static unsigned long lastSettingsPrint = 0;
-    if(millis() - lastSettingsPrint >= 5000){
-        printSettings();
+    // static unsigned long lastSettingsPrint = 0;
+    // if(millis() - lastSettingsPrint >= 5000){
+    //     printSettings();
 
-        Serial.println(F("------------------"));
+    //     Serial.println(F("------------------"));
 
-        lastSettingsPrint = millis();
-    }
+    //     lastSettingsPrint = millis();
+    // }
 
     if(!validSettings(settings)){
         return;
     }
 
     static unsigned long previousMillis = millis() - settings.measurementInterval;
-
     if (millis() - previousMillis >= settings.measurementInterval) {
         previousMillis = millis();
 
-        bool sendResult = sendTelemetry();
-        if (sendResult == false) {
-        Serial.println("Loop failed to send telemetry to AWS");
-        Serial.println("Restarting ESP32");
-        ESP.restart();
+        int moisture = readMoisture();
+
+        Serial.println("--------------------------------");
+        Serial.print("Moisture: ");
+        Serial.print(moisture);
+        Serial.println("%");
+
+        bool sendResult = AWSConnection::publishTelemetry(
+            "{\"moisture\":" + String(moisture) + "}"
+        );
+
+        if(!sendResult){
+            Serial.println("Loop failed to send telemetry to AWS");
+            Serial.println("Restarting ESP32");
+            ESP.restart();
         }
     }
 }

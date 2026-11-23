@@ -5,6 +5,8 @@ WebServer ConfigServer::server;
 DeviceSettings* ConfigServer::settingsPtr = nullptr;
 
 void ConfigServer::start(DeviceSettings &settings){
+    settingsPtr = &settings;
+
     WiFi.disconnect(true);
     WiFi.mode(WIFI_AP);
 
@@ -47,8 +49,8 @@ void ConfigServer::handleSave(){
     String ssid = server.arg("ssid");
     String password = server.arg("password");
 
-    strncpy(settingsPtr->wifiSSID, ssid.c_str(), sizeof(ssid));
-    strncpy(settingsPtr->wifiPassword, password.c_str(), sizeof(password));
+    strncpy(settingsPtr->wifiSSID, ssid.c_str(), sizeof(settingsPtr->wifiSSID)-1);
+    strncpy(settingsPtr->wifiPassword, password.c_str(), sizeof(settingsPtr->wifiSSID)-1);
     
     SettingsStorage::save(*settingsPtr);
 

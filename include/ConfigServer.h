@@ -3,7 +3,6 @@
 
 #include "DeviceSettings.h"
 
-
 class ConfigServer {
     static WebServer server;
     static DeviceSettings* settingsPtr;

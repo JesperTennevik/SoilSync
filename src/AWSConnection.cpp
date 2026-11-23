@@ -109,14 +109,20 @@ void AWSConnection::messageHandler(String &topic, String &payload){
 
         if(!desired.isNull()){
             Serial.println("desired state:");
-
-            if(desired["measurementInterval"].is<unsigned long>()){
-                settingsPtr->measurementInterval = desired["measurementInterval"].as<unsigned long>();
-                SettingsStorage::save(*settingsPtr);
-            }
-
             serializeJsonPretty(desired, Serial);
             Serial.println();
+
+            if(desired["measurementInterval"].is<unsigned long>()){
+                if(settingsPtr->measurementInterval != desired["measurementInterval"].as<unsigned long>()){
+                    settingsPtr->measurementInterval = desired["measurementInterval"].as<unsigned long>();
+                    
+                    SettingsStorage::save(*settingsPtr);
+                    reportMeasurementInterval(settingsPtr->measurementInterval);
+
+                    Serial.print("\r\nNew measurement interval: ");
+                    Serial.println(settingsPtr->measurementInterval);
+                }
+            }
         }
     }
 

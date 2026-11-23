@@ -105,17 +105,17 @@ void AWSConnection::messageHandler(String &topic, String &payload){
     deserializeJson(doc, payload);
 
     if(topic.endsWith("/get/accepted")){
-        JsonObject reported = doc["state"]["reported"];
+        JsonObject desired = doc["state"]["desired"];
 
-        if(!reported.isNull()){
-            Serial.println("Reported state:");
+        if(!desired.isNull()){
+            Serial.println("desired state:");
 
-            if(reported["measurementInterval"].is<long>()){
-                settingsPtr->measurementInterval = reported["measurementInterval"].as<long>();
+            if(desired["measurementInterval"].is<unsigned long>()){
+                settingsPtr->measurementInterval = desired["measurementInterval"].as<unsigned long>();
                 SettingsStorage::save(*settingsPtr);
             }
 
-            serializeJsonPretty(reported, Serial);
+            serializeJsonPretty(desired, Serial);
             Serial.println();
         }
     }

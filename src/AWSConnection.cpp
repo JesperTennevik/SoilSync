@@ -1,24 +1,40 @@
 #include "AWSConnection.h"
+#include "ConfigServer.h"
 #include <ArduinoJson.h>
 
 WiFiClientSecure AWSConnection::wifiClient = WiFiClientSecure();
 MQTTClient AWSConnection::mqttClient = MQTTClient(1024);
 DeviceSettings* AWSConnection::settingsPtr = nullptr;
 
-void AWSConnection::connectWifi(const char* wifiSSID, const char* wifiPassword){
+bool AWSConnection::connectWifi(const char* wifiSSID, const char* wifiPassword){    
+    if(!(strlen(wifiSSID) > 0 && strlen(wifiPassword) > 0)){
+        return false;
+    }
+    
     WiFi.mode(WIFI_STA);
     WiFi.begin(wifiSSID, wifiPassword);
 
+    unsigned long start = millis();
+    unsigned long timeout = 10 * 1000;
+
     while(WiFi.status() != WL_CONNECTED){
+        if(millis() - start > timeout){
+            return false;
+        }
+
         delay(500);
         Serial.print(".");
     }
+
+    return true;
 }
 
 void AWSConnection::connectAWS(DeviceSettings &settings){
     settingsPtr = &settings;
-
-    connectWifi(settings.wifiSSID, settings.wifiPassword);
+    
+    if(!connectWifi(settings.wifiSSID, settings.wifiPassword)){
+        ConfigServer::start(settings);
+    }
     
     wifiClient.setCACert(AWS_CERT_CA);
     wifiClient.setCertificate(AWS_CERT_CRT);
@@ -27,7 +43,7 @@ void AWSConnection::connectAWS(DeviceSettings &settings){
     mqttClient.begin(AWS_IOT_ENDPOINT, 8883, wifiClient);
 
     char tlsError[100];
-    if(wifiClient.connect(AWS_IOT_ENDPOINT, 8883)) {
+    if(wifiClient.connect(AWS_IOT_ENDPOINT, 8883)){
         Serial.println("TLS verification succeeded");
     }
     else {
@@ -43,7 +59,7 @@ void AWSConnection::connectAWS(DeviceSettings &settings){
 
     Serial.print("Connecting to AWS IOT");
 
-    while(!mqttClient.connect(settings.deviceId)) {
+    while(!mqttClient.connect(settings.deviceId)){
         Serial.print(".");
         delay(100);
     }
@@ -81,7 +97,7 @@ void AWSConnection::setupShadow(){
     mqttClient.publish(topic, "");
 }
 
-void AWSConnection::messageHandler(String &topic, String &payload) {
+void AWSConnection::messageHandler(String &topic, String &payload){
     Serial.println("incoming: " + topic + " - " + payload);
 
     JsonDocument doc;

@@ -14,7 +14,7 @@ class AWSConnection{
 
     static void setupShadow();
     
-    static void connectWifi(const char* wifiSSID, const char* wifiPassword);
+    static bool connectWifi(const char* wifiSSID, const char* wifiPassword);
     static void messageHandler(String &topic, String &payload);
     static void reportMeasurementInterval(unsigned long interval);
 

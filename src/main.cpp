@@ -6,6 +6,7 @@
 
 DeviceSettings settings;
 void printSettings(){
+    Serial.println();
     Serial.print("DeviceId: ");
     Serial.println(settings.deviceId);
     
@@ -32,10 +33,10 @@ bool sendTelemetry() {
 
 void setup() {
     Serial.begin(115200);
-    delay(2000);
+    delay(5000);
 
     SettingsStorage::load(settings);
-    
+    printSettings();
     AWSConnection::connectAWS(settings);
 }
 

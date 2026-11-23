@@ -1,5 +1,6 @@
 #include "AWSConnection.h"
 #include "ConfigServer.h"
+#include "SettingsStorage.h"
 #include <ArduinoJson.h>
 
 WiFiClientSecure AWSConnection::wifiClient = WiFiClientSecure();
@@ -108,6 +109,11 @@ void AWSConnection::messageHandler(String &topic, String &payload){
 
         if(!reported.isNull()){
             Serial.println("Reported state:");
+
+            if(reported["measurementInterval"].is<long>()){
+                settingsPtr->measurementInterval = reported["measurementInterval"].as<long>();
+                SettingsStorage::save(*settingsPtr);
+            }
 
             serializeJsonPretty(reported, Serial);
             Serial.println();

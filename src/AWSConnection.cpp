@@ -117,13 +117,13 @@ void AWSConnection::messageHandler(String &topic, String &payload){
                     settingsPtr->measurementInterval = desired["measurementInterval"].as<unsigned long>();
                     
                     SettingsStorage::save(*settingsPtr);
-                    reportMeasurementInterval(settingsPtr->measurementInterval);
 
                     Serial.print("\r\nNew measurement interval: ");
                     Serial.println(settingsPtr->measurementInterval);
                 }
             }
         }
+        reportMeasurementInterval(settingsPtr->measurementInterval);
     }
 
     if(topic.endsWith("/update/delta")){

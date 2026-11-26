@@ -36,7 +36,6 @@ Connect the sensor signal output to `A0`, VCC to a power pin, and GND to GND.
 ## Wi-Fi setup
 
 If the saved Wi-Fi connection fails:
-
 1. Connect the ESP32 to the `ESP32-Setup` Wi-Fi access point.
 2. Open `http://192.168.4.1`.
 3. Enter the Wi-Fi SSID and password.
@@ -44,7 +43,7 @@ If the saved Wi-Fi connection fails:
 
 ## Build and upload
 
-1. Open the project in VS Code.
+1. Open the project in a PlatformIO compatible environment.
 2. Connect the Arduino Nano ESP32.
 3. Run **PlatformIO: Build**.
 4. Run **PlatformIO: Upload**.

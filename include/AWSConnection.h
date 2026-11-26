@@ -1,7 +1,7 @@
 #pragma once
 #include <WiFiClientSecure.h>
 #include <MQTTClient.h>
-#include "aws_secrets_E8F60AC04A24.h"
+#include "aws_secrets.h"
 #include "DeviceSettings.h"
 
 #define AWS_IOT_PUBLISH_TOPIC "/telemetry"

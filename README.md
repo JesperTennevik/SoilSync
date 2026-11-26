@@ -2,6 +2,9 @@
 
 SoilSync is an IoT project for the Arduino Nano ESP32. It reads soil moisture, sends the measurement to AWS IoT over MQTT, and allows the measurement interval to be changed through the AWS IoT device shadow.
 
+
+The data is visualized via a [dashboard website](https://github.com/JesperTennevik/SoilSyncDashboard).
+
 ## How it works
 
 - Reads the soil-moisture sensor through analog pin `A0`.
